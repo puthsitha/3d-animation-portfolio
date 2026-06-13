@@ -4,13 +4,16 @@
 # next.js
 /.next/
 /out/
+next-env.d.ts
 
-# production
+# build output
+/dist
 /build
 
 # misc
 .DS_Store
 *.pem
+*.tsbuildinfo
 
 # debug
 npm-debug.log*
@@ -20,10 +23,8 @@ yarn-error.log*
 # env files
 .env*
 
-# typescript
-*.tsbuildinfo
-next-env.d.ts
+# local source assets (large raw 3D exports)
+/assets
 
-# vercel
 .vercel
 .claude/settings.local.json
