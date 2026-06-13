@@ -1,39 +1,48 @@
-# Portfolio
+# Puthsitha — 3D Portfolio
 
-Personal developer portfolio — Next.js (App Router) · TypeScript · Tailwind CSS · Framer Motion.
+Scroll-driven 3D portfolio landing page (inspired by the WebGi Canon camera demo),
+built with **Next.js (App Router) + TypeScript**, Three.js and GSAP ScrollTrigger.
 
-The centerpiece is a scroll-driven 3D figurine: `public/figurine-spin.mp4` is scrubbed via
-`video.currentTime` tied to scroll progress (Framer Motion `useScroll`), pinned in the viewport
-while caption phases cross-fade past it. On touch devices and with `prefers-reduced-motion`,
-it gracefully falls back to a simple autoplay loop.
-
-## Editing content
-
-All personal content (name, tagline, skills, projects, experience, links) lives in one file:
-[`lib/data.ts`](lib/data.ts). Edit it and everything updates.
-
-## Development
+## Run
 
 ```bash
 npm install
-npm run dev      # http://localhost:3000
+npm run dev      # dev server at http://localhost:3000
 npm run build    # production build
+npm start        # serve the production build
 ```
 
-## Smooth scrubbing tip
+## The 3D model
 
-If the scroll-scrub ever feels steppy, re-encode the video with a keyframe every frame so
-the decoder can seek instantly to any time:
+The hooded-human model lives at `public/models/me.glb` — it was Draco-compressed
+from the 78 MB raw export down to ~2 MB with:
 
 ```bash
-ffmpeg -i assets/figurine-spin.mp4 -g 1 -an -movflags +faststart -crf 23 public/figurine-spin.mp4
+npx @gltf-transform/cli optimize "assets/hooded_human_3d_model.glb" \
+  public/models/me.glb --compress draco --texture-compress webp
 ```
 
-## Deploy
+If `public/models/me.glb` is ever missing, the loader falls back to a placeholder
+capsule-person so the site still runs. The model is auto-scaled to ~1.6 world
+units tall and stood on the plinth, so any export size/origin works.
 
-Push to GitHub and import the repo on [Vercel](https://vercel.com/new) — no configuration
-needed. Or from the CLI:
+## Tweaking camera framing
 
-```bash
-npx vercel
-```
+All per-section camera positions/targets live in the `KEYFRAMES` object at the
+top of [lib/scroll.ts](lib/scroll.ts) — each section has a commented `pos` /
+`target` pair (figurine is ~1.6 units tall; y≈1.0 is its chest, y≈1.5 its head).
+
+## Architecture
+
+The static section markup is **server-rendered** (good first paint / SEO); all
+Three.js + GSAP work runs in a client controller that **dynamically imports** the
+heavy libs, so nothing WebGL-related touches SSR.
+
+- `app/layout.tsx` — root layout + metadata
+- `app/page.tsx` — server-rendered sections, canvas, loader, explore buttons
+- `app/globals.css` — dark minimal styling
+- `components/SceneController.tsx` — `"use client"` controller: render loop,
+  loader progress, visibility/resize handling, cleanup on unmount
+- `lib/scene.ts` — renderer, environment lighting, plinth + figurine (with fallback)
+- `lib/scroll.ts` — GSAP ScrollTrigger camera timeline, snap, explore mode
+- `public/draco/` — Draco decoder (served for GLTF decompression)
