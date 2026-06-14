@@ -19,6 +19,7 @@
 
 html {
   scroll-behavior: auto; /* GSAP handles smoothing/snap, not CSS */
+  background: var(--bg); /* guarantees a dark base even before paint */
 }
 
 body {
@@ -36,13 +37,28 @@ body.is-exploring {
 /* ---------------------------------------------------------------- */
 /*  Fixed canvas behind content                                      */
 /* ---------------------------------------------------------------- */
-#webgl {
+/* ---------------------------------------------------------------- */
+/*  Animated aurora shader background (very back)                     */
+/* ---------------------------------------------------------------- */
+.shader-bg {
   position: fixed;
   inset: 0;
   width: 100%;
   height: 100%;
   display: block;
   z-index: 0;
+  pointer-events: none;
+  background: var(--bg); /* dark fallback if the GL context is lost/blank */
+}
+
+/* Transparent figurine canvas, floating above the aurora */
+#webgl {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  display: block;
+  z-index: 1;
 }
 
 body.is-exploring #webgl {
@@ -108,7 +124,7 @@ body.is-exploring #webgl {
 /* ---------------------------------------------------------------- */
 #content {
   position: relative;
-  z-index: 1;
+  z-index: 2;
   pointer-events: none; /* let only interactive children catch the pointer */
 }
 
@@ -345,4 +361,217 @@ h2 {
   .card {
     padding: 16px 18px;
   }
+}
+
+/* ---------------------------------------------------------------- */
+/*  Typewriter (hero subtitle)                                       */
+/* ---------------------------------------------------------------- */
+.hero-subtitle {
+  min-height: 1.3em; /* reserve space so layout doesn't jump while typing */
+}
+
+.typewriter__caret {
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 4px;
+  background: var(--accent);
+  vertical-align: -0.12em;
+  animation: caret-blink 1s steps(1) infinite;
+}
+
+.typewriter__caret.is-static {
+  animation: none;
+}
+
+@keyframes caret-blink {
+  50% {
+    opacity: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/*  Gooey text morphing                                              */
+/* ---------------------------------------------------------------- */
+.gooey {
+  display: inline-block;
+}
+
+.gooey__filter {
+  position: absolute;
+  width: 0;
+  height: 0;
+}
+
+.contact-heading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+
+.gooey.contact-morph {
+  display: block;
+  width: 100%;
+}
+
+.gooey__stage {
+  position: relative;
+  display: block;
+  height: 1.1em;
+  filter: url(#gooey-threshold);
+}
+
+.gooey__text {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  color: var(--accent);
+  line-height: 1;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Liquid Glass button                                              */
+/* ---------------------------------------------------------------- */
+.liquid-btn {
+  position: relative;
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 16px 36px;
+  font-family: var(--font);
+  font-size: 14px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--text);
+  cursor: pointer;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.06);
+  backdrop-filter: blur(12px) saturate(160%);
+  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  box-shadow:
+    inset 0 1px 0 rgba(255, 255, 255, 0.35),
+    inset 0 -2px 8px rgba(0, 0, 0, 0.35),
+    0 12px 34px -12px rgba(138, 138, 255, 0.45);
+  overflow: hidden;
+  isolation: isolate;
+}
+
+.liquid-btn__glow {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.liquid-btn__label {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Animated custom cursor                                           */
+/* ---------------------------------------------------------------- */
+.cursor-dot,
+.cursor-ring {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 9999;
+  pointer-events: none;
+  border-radius: 50%;
+  will-change: transform, left, top;
+}
+
+.cursor-dot {
+  width: 7px;
+  height: 7px;
+  margin: -3.5px 0 0 -3.5px;
+  background: var(--text);
+  mix-blend-mode: difference;
+}
+
+.cursor-ring {
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 1px solid rgba(138, 138, 255, 0.85);
+}
+
+/* hide the native cursor only when the custom one is active */
+.has-custom-cursor,
+.has-custom-cursor * {
+  cursor: none !important;
+}
+
+/* ---------------------------------------------------------------- */
+/*  Dev camera readout (localhost only)                              */
+/* ---------------------------------------------------------------- */
+.debug-readout {
+  position: fixed;
+  left: 16px;
+  bottom: 16px;
+  z-index: 40;
+  width: min(92vw, 440px);
+  padding: 10px 12px;
+  background: rgba(10, 10, 18, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 10px;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  pointer-events: auto;
+}
+
+.debug-readout__row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 6px;
+}
+
+.debug-readout__label {
+  font-size: 10px;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.debug-readout__copy {
+  font-family: inherit;
+  font-size: 11px;
+  padding: 3px 12px;
+  color: var(--text);
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.debug-readout__copy:hover {
+  background: rgba(255, 255, 255, 0.16);
+}
+
+.debug-readout__value {
+  display: block;
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--accent);
+  word-break: break-word;
+}
+
+.debug-readout__hint {
+  display: block;
+  margin-top: 6px;
+  font-size: 10px;
+  color: var(--text-dim);
 }

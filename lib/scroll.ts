@@ -25,8 +25,8 @@ const KEYFRAMES = {
   //     figure stays facing us while it turns its head toward the text on the
   //     right. Camera sits on the same side it's looking, model held on the
   //     left of frame (target.x > 0). yaw turns the gaze toward screen-right.
-  about: { pos: [1.4, 1.5, 2.4], target: [0.4, 1.25, 0.0], yaw: 0.5 },
-
+  // about: { pos: [1.4, 1.5, 2.4], target: [0.4, 1.25, 0.0], yaw: 0.5 },
+  about: { pos: [2.44, 1.2, 1.51], target: [-0.49, 1.06, 0.0], yaw: -0.1 },
   // 3 · PROJECTS — orbit around to the model's side, slightly low,
   //     leaving the right half of the screen free for the cards. Cards
   //     sit on the LEFT, so the figure turns its face toward screen-left.
@@ -81,20 +81,73 @@ export function createScrollDirector(world: World): ScrollDirector {
 
   // Animate position AND lookAt target together for each leg.
   // (cameraTarget is re-applied via camera.lookAt in the render loop.)
-  tl.to(camera.position, { x: KEYFRAMES.about.pos[0], y: KEYFRAMES.about.pos[1], z: KEYFRAMES.about.pos[2] }, 0)
-    .to(cameraTarget, { x: KEYFRAMES.about.target[0], y: KEYFRAMES.about.target[1], z: KEYFRAMES.about.target[2] }, 0)
-    // turn the figure to face the About text, and fade the hero idle-sway out
+  tl.to(
+    camera.position,
+    {
+      x: KEYFRAMES.about.pos[0],
+      y: KEYFRAMES.about.pos[1],
+      z: KEYFRAMES.about.pos[2],
+    },
+    0,
+  )
+    .to(
+      cameraTarget,
+      {
+        x: KEYFRAMES.about.target[0],
+        y: KEYFRAMES.about.target[1],
+        z: KEYFRAMES.about.target[2],
+      },
+      0,
+    )
+    // turn the figure to face the About text, fade the hero loop spin out and
+    // fade the gentle left↔right sway in for ABOUT & PROJECTS
     .to(world.modelYaw, { value: KEYFRAMES.about.yaw }, 0)
     .to(world.idleSpin, { strength: 0 }, 0)
+    .to(world.sway, { strength: 1 }, 0)
 
-    .to(camera.position, { x: KEYFRAMES.projects.pos[0], y: KEYFRAMES.projects.pos[1], z: KEYFRAMES.projects.pos[2] }, 1)
-    .to(cameraTarget, { x: KEYFRAMES.projects.target[0], y: KEYFRAMES.projects.target[1], z: KEYFRAMES.projects.target[2] }, 1)
+    .to(
+      camera.position,
+      {
+        x: KEYFRAMES.projects.pos[0],
+        y: KEYFRAMES.projects.pos[1],
+        z: KEYFRAMES.projects.pos[2],
+      },
+      1,
+    )
+    .to(
+      cameraTarget,
+      {
+        x: KEYFRAMES.projects.target[0],
+        y: KEYFRAMES.projects.target[1],
+        z: KEYFRAMES.projects.target[2],
+      },
+      1,
+    )
     // continue the turn so the figure faces the Projects cards on the left
     .to(world.modelYaw, { value: KEYFRAMES.projects.yaw }, 1)
 
-    .to(camera.position, { x: KEYFRAMES.contact.pos[0], y: KEYFRAMES.contact.pos[1], z: KEYFRAMES.contact.pos[2] }, 2)
-    .to(cameraTarget, { x: KEYFRAMES.contact.target[0], y: KEYFRAMES.contact.target[1], z: KEYFRAMES.contact.target[2] }, 2)
-    .to(world.modelYaw, { value: KEYFRAMES.contact.yaw }, 2);
+    .to(
+      camera.position,
+      {
+        x: KEYFRAMES.contact.pos[0],
+        y: KEYFRAMES.contact.pos[1],
+        z: KEYFRAMES.contact.pos[2],
+      },
+      2,
+    )
+    .to(
+      cameraTarget,
+      {
+        x: KEYFRAMES.contact.target[0],
+        y: KEYFRAMES.contact.target[1],
+        z: KEYFRAMES.contact.target[2],
+      },
+      2,
+    )
+    .to(world.modelYaw, { value: KEYFRAMES.contact.yaw }, 2)
+    // stop the sway and let the figure loop all the way around on CONTACT
+    .to(world.sway, { strength: 0 }, 2)
+    .to(world.contactSpin, { strength: 1 }, 2);
 
   /* ------------------------------------------------------------ */
   /*  Per-section content animations                               */
@@ -114,7 +167,7 @@ export function createScrollDirector(world: World): ScrollDirector {
         start: "top 60%",
         toggleActions: "play none none reverse",
       },
-    })
+    }),
   );
 
   // Headings drift up as their section arrives
@@ -130,7 +183,7 @@ export function createScrollDirector(world: World): ScrollDirector {
           start: "top 65%",
           toggleActions: "play none none reverse",
         },
-      })
+      }),
     );
   }
 
@@ -165,7 +218,9 @@ export function createScrollDirector(world: World): ScrollDirector {
 
     // Glide from wherever scroll left the camera to a nice orbit seat
     gsap.to(camera.position, {
-      x: EXPLORE_POS.x, y: EXPLORE_POS.y, z: EXPLORE_POS.z,
+      x: EXPLORE_POS.x,
+      y: EXPLORE_POS.y,
+      z: EXPLORE_POS.z,
       duration: 1.2,
       ease: "power2.inOut",
     });
@@ -182,12 +237,16 @@ export function createScrollDirector(world: World): ScrollDirector {
 
     // Fly back to the contact framing, then hand control to scroll again
     gsap.to(camera.position, {
-      x: KEYFRAMES.contact.pos[0], y: KEYFRAMES.contact.pos[1], z: KEYFRAMES.contact.pos[2],
+      x: KEYFRAMES.contact.pos[0],
+      y: KEYFRAMES.contact.pos[1],
+      z: KEYFRAMES.contact.pos[2],
       duration: 1.0,
       ease: "power2.inOut",
     });
     gsap.to(cameraTarget, {
-      x: KEYFRAMES.contact.target[0], y: KEYFRAMES.contact.target[1], z: KEYFRAMES.contact.target[2],
+      x: KEYFRAMES.contact.target[0],
+      y: KEYFRAMES.contact.target[1],
+      z: KEYFRAMES.contact.target[2],
       duration: 1.0,
       ease: "power2.inOut",
       onComplete: () => {
@@ -219,5 +278,11 @@ export function createScrollDirector(world: World): ScrollDirector {
     tl.kill();
   }
 
-  return { enterExplore, exitExplore, isExploring: () => exploring, update, destroy };
+  return {
+    enterExplore,
+    exitExplore,
+    isExploring: () => exploring,
+    update,
+    destroy,
+  };
 }

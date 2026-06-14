@@ -18,6 +18,18 @@ export interface World {
   /** 0 → no idle sway, 1 → full amplitude. scroll.ts fades this out past hero. */
   idleSpin: { strength: number };
   /**
+   * Gentle left↔right head-sway loop. 0 → off, 1 → full amplitude.
+   * scroll.ts fades this in over ABOUT & PROJECTS so the figure rocks softly
+   * around whatever modelYaw it's holding.
+   */
+  sway: { strength: number };
+  /**
+   * Continuous full-turn "loop around" on the CONTACT section. 0 → off,
+   * 1 → spinning. Same mechanism as the hero idleSpin but kept separate so it
+   * doesn't re-trigger the hero orbiters.
+   */
+  contactSpin: { strength: number };
+  /**
    * Absolute Y rotation (radians) of the figurine, animated by scroll.ts so the
    * model turns to "look at" each section. 0 = facing the camera (front).
    * Positive = turns its face toward screen-right, negative = screen-left.
@@ -39,8 +51,10 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   const renderer = new THREE.WebGLRenderer({
     canvas,
     antialias: true,
+    alpha: true, // transparent canvas so the aurora shader shows through behind
     powerPreference: "high-performance",
   });
+  renderer.setClearColor(0x000000, 0);
   renderer.setSize(window.innerWidth, window.innerHeight);
   renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2)); // mobile cap
   renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -53,7 +67,9 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   /*  Scene, environment & camera                                  */
   /* ------------------------------------------------------------ */
   const scene = new THREE.Scene();
-  scene.background = new THREE.Color(0x0c0c0e);
+  // No opaque background — the canvas is transparent and the AnimatedShader
+  // aurora renders behind it. Fog still fades very distant orbiters into the
+  // dark base tone so depth reads correctly over the aurora.
   scene.fog = new THREE.Fog(0x0c0c0e, 8, 18);
 
   // Image-based lighting from three's built-in RoomEnvironment —
@@ -126,10 +142,15 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   /*  Resize / render loop                                         */
   /* ------------------------------------------------------------ */
   const idleSpin = { strength: 1 };
+  const sway = { strength: 0 };
+  const contactSpin = { strength: 0 };
   const modelYaw = { value: 0 };
-  let spinOffset = 0; // accumulated hero loop rotation (radians)
+  let spinOffset = 0; // accumulated loop rotation (radians)
+  let swayClock = 0; // real-time clock driving the left↔right sway
   const TWO_PI = Math.PI * 2;
   const SPIN_SPEED = 0.6; // rad/s while looping → ~10.5s per full turn
+  const SWAY_AMP = 0.28; // radians (~16°) of left↔right rock
+  const SWAY_FREQ = 0.9; // rad/s → one full rock every ~7s
 
   function resize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -139,19 +160,24 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   }
 
   function render(dt: number) {
-    // Figurine facing = scroll-driven yaw + a hero loop spin. While in the
-    // hero (idleSpin.strength === 1) the model rotates continuously, one full
-    // turn at a time. scroll.ts fades strength to 0 over the hero→About leg;
-    // as it fades we ease the accumulated spin to the NEAREST full turn, so
-    // the model settles exactly front-facing and lands on modelYaw — keeping
-    // every section's keyframe deterministic (About stays identical).
-    spinOffset += dt * SPIN_SPEED * idleSpin.strength;
-    const settle = 1 - idleSpin.strength; // 0 in hero, → 1 leaving it
+    // Figurine facing = scroll-driven yaw + a continuous loop spin + a sway.
+    //
+    // LOOP SPIN: active in the HERO (idleSpin) and CONTACT (contactSpin)
+    // sections, where the model rotates continuously one full turn at a time.
+    // Between them scroll.ts fades both to 0; as the loop fades we ease the
+    // accumulated spin to the NEAREST full turn so the model settles exactly
+    // on modelYaw — keeping every section's keyframe deterministic.
+    const loop = idleSpin.strength + contactSpin.strength; // ≤1 (mutually exclusive)
+    spinOffset += dt * SPIN_SPEED * loop;
+    const settle = 1 - loop; // 0 while looping, → 1 between loops
     if (settle > 0.001) {
       const nearest = Math.round(spinOffset / TWO_PI) * TWO_PI;
       spinOffset += (nearest - spinOffset) * (1 - Math.exp(-settle * 6 * dt));
     }
-    stage.rotation.y = modelYaw.value + spinOffset;
+    // SWAY: gentle left↔right rock around modelYaw on ABOUT & PROJECTS.
+    swayClock += dt;
+    const swayOffset = Math.sin(swayClock * SWAY_FREQ) * SWAY_AMP * sway.strength;
+    stage.rotation.y = modelYaw.value + spinOffset + swayOffset;
     // Tech swarm orbits the figurine; shares the hero fade (idleSpin.strength).
     orbiters.update(dt, idleSpin.strength);
     camera.lookAt(cameraTarget);
@@ -171,7 +197,7 @@ export function createWorld(canvas: HTMLCanvasElement): World {
     renderer.forceContextLoss();
   }
 
-  return { renderer, scene, camera, stage, cameraTarget, idleSpin, modelYaw, resize, render, dispose };
+  return { renderer, scene, camera, stage, cameraTarget, idleSpin, sway, contactSpin, modelYaw, resize, render, dispose };
 }
 
 /* ---------------------------------------------------------------- */

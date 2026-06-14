@@ -30,6 +30,37 @@ export default function SceneController() {
       const percentEl = document.getElementById("loader-percent")!;
       const barEl = document.getElementById("loader-bar-fill")!;
 
+      /* ---- dev camera readout (localhost only; toggle with "D") ---- */
+      const isLocal = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+      const debugEl = document.getElementById("debug-readout") as HTMLElement | null;
+      const debugValEl = document.getElementById("debug-readout-value");
+      const debugCopyBtn = document.getElementById("debug-copy") as HTMLButtonElement | null;
+      let debugVisible = isLocal;
+      let lastDebug = 0;
+      const fmt = (n: number) => n.toFixed(2);
+      const keyframeText = () => {
+        const p = world!.camera.position;
+        const tg = world!.cameraTarget;
+        const yw = world!.modelYaw.value;
+        return `{ pos: [${fmt(p.x)}, ${fmt(p.y)}, ${fmt(p.z)}], target: [${fmt(tg.x)}, ${fmt(tg.y)}, ${fmt(tg.z)}], yaw: ${fmt(yw)} }`;
+      };
+      if (debugEl) debugEl.hidden = !debugVisible;
+      const onDebugKey = (e: KeyboardEvent) => {
+        if (!isLocal || e.key.toLowerCase() !== "d") return;
+        debugVisible = !debugVisible;
+        if (debugEl) debugEl.hidden = !debugVisible;
+      };
+      const onDebugCopy = () => {
+        navigator.clipboard?.writeText(keyframeText());
+        if (debugCopyBtn) {
+          const prev = debugCopyBtn.textContent;
+          debugCopyBtn.textContent = "Copied";
+          setTimeout(() => { debugCopyBtn.textContent = prev; }, 1000);
+        }
+      };
+      window.addEventListener("keydown", onDebugKey);
+      debugCopyBtn?.addEventListener("click", onDebugCopy);
+
       /* ---- render loop, paused while the tab is hidden ---- */
       let lastT = performance.now();
       const tick = (t: number) => {
@@ -37,6 +68,10 @@ export default function SceneController() {
         lastT = t;
         director?.update();
         world!.render(dt);
+        if (debugVisible && debugValEl && t - lastDebug > 120) {
+          lastDebug = t;
+          debugValEl.textContent = keyframeText();
+        }
         rafId = requestAnimationFrame(tick);
       };
       const start = () => {
@@ -54,6 +89,8 @@ export default function SceneController() {
       cleanupListeners = () => {
         document.removeEventListener("visibilitychange", onVisibility);
         window.removeEventListener("resize", onResize);
+        window.removeEventListener("keydown", onDebugKey);
+        debugCopyBtn?.removeEventListener("click", onDebugCopy);
       };
 
       start();
