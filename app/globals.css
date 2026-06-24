@@ -391,18 +391,8 @@ h2 {
 }
 
 /* ---------------------------------------------------------------- */
-/*  Gooey text morphing                                              */
+/*  Rotating text (contact heading) — cheap slide+fade, no filters    */
 /* ---------------------------------------------------------------- */
-.gooey {
-  display: inline-block;
-}
-
-.gooey__filter {
-  position: absolute;
-  width: 0;
-  height: 0;
-}
-
 .contact-heading {
   display: flex;
   flex-direction: column;
@@ -410,27 +400,358 @@ h2 {
   gap: 4px;
 }
 
-.gooey.contact-morph {
-  display: block;
+.rotating-text {
+  position: relative;
+  display: inline-grid;
+  place-items: center;
+  line-height: 1.1;
+}
+
+.rotating-text.contact-morph {
+  display: grid;
   width: 100%;
 }
 
-.gooey__stage {
-  position: relative;
-  display: block;
-  height: 1.1em;
-  filter: url(#gooey-threshold);
+/* invisible ghost reserves the widest word's footprint */
+.rotating-text__ghost {
+  grid-area: 1 / 1;
+  visibility: hidden;
+  white-space: nowrap;
 }
 
-.gooey__text {
-  position: absolute;
-  inset: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
+.rotating-text__word {
+  grid-area: 1 / 1;
   color: var(--accent);
-  line-height: 1;
+  white-space: nowrap;
+}
+
+.rotating-text__word.is-animated {
+  animation: rotating-word 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@keyframes rotating-word {
+  from {
+    opacity: 0;
+    transform: translateY(0.5em);
+    filter: blur(2px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rotating-text__word.is-animated {
+    animation: none;
+  }
+}
+
+/* ---------------------------------------------------------------- */
+/*  CV detail block (below the 3D experience)                        */
+/* ---------------------------------------------------------------- */
+.cv-extra {
+  position: relative;
+  z-index: 3; /* solid layer above the fixed canvas (z-index 1) */
+  background:
+    radial-gradient(120% 80% at 50% 0%, #15151f 0%, var(--bg) 60%);
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cv-section {
+  padding: clamp(64px, 11vw, 140px) clamp(24px, 7vw, 120px);
+}
+
+.cv-section--alt {
+  background: rgba(255, 255, 255, 0.015);
+}
+
+.cv-section__inner {
+  display: grid;
+  grid-template-columns: 0.85fr 1.15fr;
+  align-items: center;
+  gap: clamp(28px, 6vw, 88px);
+  max-width: 1080px;
+  margin: 0 auto;
+}
+
+.cv-section__inner--reverse .cv-section__art {
+  order: 2;
+}
+
+.cv-section__body h2 {
+  margin-bottom: 32px;
+}
+
+/* 3D-style SVG artwork */
+.section-art {
+  width: 100%;
+  max-width: 320px;
+  margin: 0 auto;
+  filter: drop-shadow(0 26px 48px rgba(91, 91, 255, 0.28));
+  animation: art-float 6s ease-in-out infinite;
+}
+
+.section-art svg {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+@keyframes art-float {
+  0%, 100% { transform: translateY(-8px) rotate(-1deg); }
+  50% { transform: translateY(8px) rotate(1deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .section-art {
+    animation: none;
+  }
+}
+
+/* Timeline (experience / education) */
+.timeline {
+  list-style: none;
+  position: relative;
+  padding-left: 26px;
+}
+
+.timeline::before {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 6px;
+  bottom: 6px;
+  width: 1px;
+  background: linear-gradient(
+    to bottom,
+    var(--accent),
+    rgba(138, 138, 255, 0.1)
+  );
+}
+
+.timeline__item {
+  position: relative;
+  padding-bottom: 30px;
+}
+
+.timeline__item:last-child {
+  padding-bottom: 0;
+}
+
+.timeline__item::before {
+  content: "";
+  position: absolute;
+  left: -26px;
+  top: 6px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: var(--accent);
+  box-shadow: 0 0 0 4px rgba(138, 138, 255, 0.15);
+}
+
+.timeline__date {
+  font-size: 12px;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.timeline__item h3 {
+  margin: 6px 0 8px;
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 400;
+}
+
+.timeline__item p {
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.65;
+  color: var(--text-dim);
+  max-width: 46ch;
+}
+
+/* Skill bars */
+.skill-bars {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+  margin-bottom: 36px;
+}
+
+.skill-bar__head {
+  display: flex;
+  justify-content: space-between;
+  font-size: 14px;
+  font-weight: 300;
+  margin-bottom: 8px;
+}
+
+.skill-bar__pct {
+  color: var(--accent);
+  font-variant-numeric: tabular-nums;
+}
+
+.skill-bar__track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.07);
+  overflow: hidden;
+}
+
+.skill-bar__fill {
+  display: block;
+  height: 100%;
+  border-radius: 999px;
+  background: linear-gradient(90deg, #5b5bff, var(--accent));
+}
+
+/* Skill tags */
+.skill-tags {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.skill-tag {
+  padding: 8px 16px;
+  font-size: 13px;
+  font-weight: 300;
+  color: var(--text);
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 999px;
+}
+
+/* CV download + preview */
+.cv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin: 28px 0;
+}
+
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 14px 28px;
+  font-size: 14px;
+  letter-spacing: 0.06em;
+  text-decoration: none;
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 999px;
+  transition: background 0.25s ease, border-color 0.25s ease, transform 0.25s ease;
+}
+
+.cv-btn:hover {
+  border-color: var(--accent);
+  transform: translateY(-2px);
+}
+
+.cv-btn--primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #0c0c14;
+  font-weight: 500;
+}
+
+.cv-btn--primary:hover {
+  background: #9a9aff;
+}
+
+.cv-preview {
+  margin-top: 8px;
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  box-shadow: 0 24px 60px -28px rgba(0, 0, 0, 0.7);
+}
+
+.cv-preview__frame {
+  display: block;
+  width: 100%;
+  height: clamp(440px, 70vh, 720px);
+  border: 0;
+}
+
+/* Footer */
+.cv-footer {
+  padding: clamp(48px, 8vw, 96px) clamp(24px, 7vw, 120px) 56px;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.cv-footer__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 40px;
+  max-width: 1080px;
+  margin: 0 auto 48px;
+}
+
+.cv-meta {
+  list-style: none;
+  margin-top: 18px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.cv-meta li {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  font-size: 15px;
+  font-weight: 300;
+  color: var(--text);
+}
+
+.cv-meta li span {
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--text-dim);
+}
+
+.cv-meta a {
+  color: var(--text);
+  text-decoration: none;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.25s ease, color 0.25s ease;
+  width: fit-content;
+}
+
+.cv-meta a:hover {
+  color: var(--accent);
+  border-color: var(--accent);
+}
+
+.cv-footer__copy {
+  max-width: 1080px;
+  margin: 0 auto;
+  font-size: 13px;
+  color: var(--text-dim);
+  text-align: center;
+}
+
+@media (max-width: 760px) {
+  .cv-section__inner {
+    grid-template-columns: 1fr;
+    gap: 36px;
+  }
+
+  .cv-section__inner--reverse .cv-section__art {
+    order: 0;
+  }
+
+  .section-art {
+    max-width: 200px;
+  }
 }
 
 /* ---------------------------------------------------------------- */

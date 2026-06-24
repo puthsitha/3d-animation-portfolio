@@ -2,8 +2,11 @@ import SceneController from "@/components/SceneController";
 import AnimatedShaderBackground from "@/components/AnimatedShaderBackground";
 import Cursor from "@/components/Cursor";
 import Typewriter from "@/components/Typewriter";
-import GooeyText from "@/components/GooeyText";
+import RotatingText from "@/components/RotatingText";
 import LiquidButton from "@/components/LiquidButton";
+import SectionArt from "@/components/SectionArt";
+
+const CV_FILE = "/Puthsitha_Moeurn_CV.pdf";
 
 export default function Home() {
   return (
@@ -50,7 +53,10 @@ export default function Home() {
         </span>
       </div>
 
-      {/* Scrollable content */}
+      {/* ============================================================ */}
+      {/*  3D scroll experience — DO NOT add sections inside #content;  */}
+      {/*  the camera timeline snaps to exactly these 4 sections.       */}
+      {/* ============================================================ */}
       <main id="content">
         {/* 1 · HERO */}
         <section className="section section--hero" data-section="hero">
@@ -62,8 +68,8 @@ export default function Home() {
                 phrases={[
                   "iOS Developer",
                   "Flutter Developer",
+                  "React Native Developer",
                   "Mobile Engineer",
-                  "Animation Tinkerer",
                 ]}
               />
             </p>
@@ -84,9 +90,11 @@ export default function Home() {
               with care.
             </h2>
             <p className="body-copy">
-              I build native iOS apps in Swift and cross-platform experiences in
-              Flutter — with an obsession for smooth animation, clean
-              architecture, and the small details that make an app feel alive.
+              I&apos;m a mobile developer with hands-on experience across
+              e-commerce, education, hospital, hotel and booking-tour apps. I
+              build native iOS in Swift, UIKit &amp; SwiftUI and cross-platform
+              apps in Flutter and React Native — with a focus on clean
+              architecture, smooth animation and bank-grade API integration.
             </p>
           </div>
         </section>
@@ -98,27 +106,28 @@ export default function Home() {
             <h2>Projects</h2>
             <div className="cards">
               <article className="card">
-                <span className="card__tag">iOS · Swift</span>
-                <h3>Habitloop</h3>
+                <span className="card__tag">iOS · Swift · SwiftUI</span>
+                <h3>Hattha Mobile</h3>
                 <p>
-                  A habit tracker with streak widgets, Live Activities and a
-                  buttery custom ring animation.
+                  Enhancing and maintaining the Hattha Bank mobile app — new
+                  features, issue fixes and polished UI in Swift, UIKit and
+                  SwiftUI.
                 </p>
               </article>
               <article className="card">
-                <span className="card__tag">Flutter</span>
-                <h3>Fairfare</h3>
+                <span className="card__tag">Flutter · BLoC</span>
+                <h3>Banking &amp; Merchant Apps</h3>
                 <p>
-                  Ride-fare comparison mini app — one codebase, 60&nbsp;fps hero
-                  transitions on both platforms.
+                  Cross-platform Flutter apps with secure API and bank-service
+                  integration, built on BLoC and Provider state management.
                 </p>
               </article>
               <article className="card">
-                <span className="card__tag">iOS · SwiftUI</span>
-                <h3>Pocket Recipes</h3>
+                <span className="card__tag">React Native · Redux</span>
+                <h3>E-commerce &amp; Booking</h3>
                 <p>
-                  Offline-first recipe manager with shared SwiftData models and
-                  an iPad-optimised layout.
+                  React Native apps for e-commerce, hotel and booking-tour —
+                  ABA payment integration, Redux &amp; Zustand, led with a team.
                 </p>
               </article>
             </div>
@@ -131,7 +140,7 @@ export default function Home() {
             <p className="eyebrow">03 — Contact</p>
             <h2 className="contact-heading">
               Let&apos;s build
-              <GooeyText
+              <RotatingText
                 texts={["something", "apps", "delight", "the future"]}
                 className="contact-morph"
               />
@@ -140,11 +149,12 @@ export default function Home() {
               <a href="mailto:puthsithamouern@gmail.com">
                 puthsithamouern@gmail.com
               </a>
+              <a href="tel:+85592389497">+855 92 389 497</a>
               <a
-                href="https://github.com/puthsithamouern"
+                href="https://github.com/puthsitha"
                 target="_blank"
                 rel="noreferrer">
-                GitHub
+                github.com/puthsitha
               </a>
             </div>
             <LiquidButton id="enter-explore" className="explore-btn-liquid">
@@ -153,6 +163,247 @@ export default function Home() {
           </div>
         </section>
       </main>
+
+      {/* ============================================================ */}
+      {/*  CV detail — lives OUTSIDE #content (solid backdrop) so the   */}
+      {/*  3D camera timeline above is left completely untouched.       */}
+      {/* ============================================================ */}
+      <div className="cv-extra">
+        {/* EXPERIENCE */}
+        <section className="cv-section" data-cv="experience">
+          <div className="cv-section__inner">
+            <div className="cv-section__art">
+              <SectionArt variant="experience" />
+            </div>
+            <div className="cv-section__body">
+              <p className="eyebrow">04 — Experience</p>
+              <h2>Where I&apos;ve worked</h2>
+              <ol className="timeline">
+                <li className="timeline__item">
+                  <span className="timeline__date">Sep 2025 — Present</span>
+                  <h3>Mobile Developer · Hattha Bank</h3>
+                  <p>
+                    Enhance, maintain and fix issues on the Hattha Mobile app
+                    using Swift, UIKit &amp; SwiftUI, and the Hattha Merchant app
+                    using Flutter.
+                  </p>
+                </li>
+                <li className="timeline__item">
+                  <span className="timeline__date">Apr 2024 — Aug 2025</span>
+                  <h3>Mobile Developer · Digital One</h3>
+                  <p>
+                    Built Android &amp; iOS apps with Flutter, integrated APIs
+                    and bank services, using BLoC and Provider state management.
+                  </p>
+                </li>
+                <li className="timeline__item">
+                  <span className="timeline__date">Dec 2021 — Mar 2024</span>
+                  <h3>Mobile Developer · PHSAR TECH</h3>
+                  <p>
+                    Developed Android &amp; iOS apps with React Native and ABA
+                    bank integration using Redux and Zustand. Led projects,
+                    managing tasks, meetings and team responsibilities.
+                  </p>
+                </li>
+                <li className="timeline__item">
+                  <span className="timeline__date">Feb 2020</span>
+                  <h3>Leadership Training · YRDP (NGO)</h3>
+                  <p>
+                    Completed the Youth Resource Development Program&apos;s
+                    Leadership &amp; Personal Development training.
+                  </p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* EDUCATION */}
+        <section className="cv-section cv-section--alt" data-cv="education">
+          <div className="cv-section__inner cv-section__inner--reverse">
+            <div className="cv-section__art">
+              <SectionArt variant="education" />
+            </div>
+            <div className="cv-section__body">
+              <p className="eyebrow">05 — Education</p>
+              <h2>Studied &amp; certified</h2>
+              <ol className="timeline">
+                <li className="timeline__item">
+                  <span className="timeline__date">2019 — 2023</span>
+                  <h3>Royal University of Phnom Penh (RUPP)</h3>
+                  <p>Bachelor&apos;s Degree in Computer Science.</p>
+                </li>
+                <li className="timeline__item">
+                  <span className="timeline__date">2016 — 2019</span>
+                  <h3>Thmorkoul High School</h3>
+                  <p>High school diploma — passed Bac II (Grade C).</p>
+                </li>
+              </ol>
+            </div>
+          </div>
+        </section>
+
+        {/* SKILLS */}
+        <section className="cv-section" data-cv="skills">
+          <div className="cv-section__inner">
+            <div className="cv-section__art">
+              <SectionArt variant="skills" />
+            </div>
+            <div className="cv-section__body">
+              <p className="eyebrow">06 — Skills</p>
+              <h2>What I work with</h2>
+
+              <div className="skill-bars">
+                {[
+                  { label: "React (React Native & React JS)", value: 96 },
+                  { label: "Communication & Teamwork", value: 75 },
+                  { label: "Project Management", value: 50 },
+                  { label: "Design", value: 42 },
+                ].map((s) => (
+                  <div className="skill-bar" key={s.label}>
+                    <div className="skill-bar__head">
+                      <span>{s.label}</span>
+                      <span className="skill-bar__pct">{s.value}%</span>
+                    </div>
+                    <div className="skill-bar__track">
+                      <span
+                        className="skill-bar__fill"
+                        style={{ width: `${s.value}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <ul className="skill-tags">
+                {[
+                  "Swift",
+                  "UIKit",
+                  "SwiftUI",
+                  "Flutter",
+                  "React Native",
+                  "JavaScript / ES6",
+                  "TypeScript",
+                  "Redux",
+                  "Zustand",
+                  "BLoC / Provider",
+                  "REST API",
+                  "Bank / ABA integration",
+                  "App Store release",
+                ].map((t) => (
+                  <li className="skill-tag" key={t}>
+                    {t}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        {/* RESUME / CV */}
+        <section className="cv-section cv-section--alt" data-cv="resume">
+          <div className="cv-section__inner cv-section__inner--reverse">
+            <div className="cv-section__art">
+              <SectionArt variant="resume" />
+            </div>
+            <div className="cv-section__body">
+              <p className="eyebrow">07 — Résumé</p>
+              <h2>Download my CV</h2>
+              <p className="body-copy">
+                Prefer the full document? Preview it right here or grab a copy as
+                PDF.
+              </p>
+              <div className="cv-actions">
+                <a className="cv-btn cv-btn--primary" href={CV_FILE} download>
+                  ↓ Download PDF
+                </a>
+                <a
+                  className="cv-btn"
+                  href={CV_FILE}
+                  target="_blank"
+                  rel="noreferrer">
+                  ↗ Open in new tab
+                </a>
+              </div>
+              <div className="cv-preview">
+                <object
+                  data={`${CV_FILE}#view=FitH`}
+                  type="application/pdf"
+                  className="cv-preview__frame"
+                  aria-label="CV preview">
+                  <iframe
+                    src={`${CV_FILE}#view=FitH`}
+                    title="CV preview"
+                    className="cv-preview__frame"
+                  />
+                </object>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FOOTER — personal details + references */}
+        <footer className="cv-footer">
+          <div className="cv-footer__grid">
+            <div>
+              <p className="eyebrow">Personal</p>
+              <ul className="cv-meta">
+                <li>
+                  <span>Date of birth</span>March 20, 2001
+                </li>
+                <li>
+                  <span>Place of birth</span>Battambang, Cambodia
+                </li>
+                <li>
+                  <span>Nationality</span>Khmer
+                </li>
+                <li>
+                  <span>Location</span>Phnom Penh
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p className="eyebrow">References</p>
+              <ul className="cv-meta">
+                <li>
+                  <span>Mr. Louern Chhay</span>Teamwork · +855 95 288 757
+                </li>
+                <li>
+                  <span>Mr. Heng Sopharuth</span>Project Manager · +855 98 624
+                  205
+                </li>
+              </ul>
+            </div>
+            <div>
+              <p className="eyebrow">Get in touch</p>
+              <ul className="cv-meta">
+                <li>
+                  <span>Email</span>
+                  <a href="mailto:puthsithamouern@gmail.com">
+                    puthsithamouern@gmail.com
+                  </a>
+                </li>
+                <li>
+                  <span>Phone</span>
+                  <a href="tel:+85592389497">+855 92 389 497</a>
+                </li>
+                <li>
+                  <span>GitHub</span>
+                  <a
+                    href="https://github.com/puthsitha"
+                    target="_blank"
+                    rel="noreferrer">
+                    github.com/puthsitha
+                  </a>
+                </li>
+              </ul>
+            </div>
+          </div>
+          <p className="cv-footer__copy">
+            © 2026 Puthsitha Moeurn · Built with Next.js &amp; Three.js
+          </p>
+        </footer>
+      </div>
 
       {/* Client controller drives the canvas + scroll animation */}
       <SceneController />
