@@ -13,6 +13,17 @@ export interface World {
   camera: THREE.PerspectiveCamera;
   /** Group holding the figurine + plinth — rotate this for the idle spin. */
   stage: THREE.Group;
+  /**
+   * Inner group holding ONLY the figurine (not the plinth). Used for the
+   * hero pointer-look tilt so the person can nod toward the cursor while the
+   * plinth stays level.
+   */
+  figure: THREE.Group;
+  /**
+   * Normalised pointer position in [-1, 1] (x: right+, y: up+), updated by the
+   * SceneController. Drives the hero "look at the cursor" head/body turn.
+   */
+  pointer: { x: number; y: number };
   /** Point the camera looks at; animated by scroll.ts alongside position. */
   cameraTarget: THREE.Vector3;
   /** 0 → no idle sway, 1 → full amplitude. scroll.ts fades this out past hero. */
@@ -111,6 +122,10 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   const stage = new THREE.Group();
   scene.add(stage);
 
+  // Inner group for just the person — pointer-look tilts this, not the plinth.
+  const figure = new THREE.Group();
+  stage.add(figure);
+
   // Plinth
   const plinth = new THREE.Mesh(
     new THREE.CylinderGeometry(0.85, 0.95, 0.18, 64),
@@ -145,12 +160,17 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   const sway = { strength: 0 };
   const contactSpin = { strength: 0 };
   const modelYaw = { value: 0 };
+  const pointer = { x: 0, y: 0 };
+  const lookSmooth = { x: 0, y: 0 }; // eased pointer → no jitter on the figure
   let spinOffset = 0; // accumulated loop rotation (radians)
   let swayClock = 0; // real-time clock driving the left↔right sway
   const TWO_PI = Math.PI * 2;
   const SPIN_SPEED = 0.6; // rad/s while looping → ~10.5s per full turn
   const SWAY_AMP = 0.28; // radians (~16°) of left↔right rock
   const SWAY_FREQ = 0.9; // rad/s → one full rock every ~7s
+  const LOOK_YAW = 0.3; // radians (~17°) the figure turns toward the cursor X
+  const LOOK_PITCH = 0.14; // radians (~8°) it nods toward the cursor Y
+  const IDLE_BREATH = 0.05; // radians of slow drift so the hero is alive at rest
 
   function resize() {
     camera.aspect = window.innerWidth / window.innerHeight;
@@ -162,12 +182,11 @@ export function createWorld(canvas: HTMLCanvasElement): World {
   function render(dt: number) {
     // Figurine facing = scroll-driven yaw + a continuous loop spin + a sway.
     //
-    // LOOP SPIN: active in the HERO (idleSpin) and CONTACT (contactSpin)
-    // sections, where the model rotates continuously one full turn at a time.
-    // Between them scroll.ts fades both to 0; as the loop fades we ease the
-    // accumulated spin to the NEAREST full turn so the model settles exactly
-    // on modelYaw — keeping every section's keyframe deterministic.
-    const loop = idleSpin.strength + contactSpin.strength; // ≤1 (mutually exclusive)
+    // LOOP SPIN: a continuous full-turn loop on the CONTACT section
+    // (contactSpin). As it fades we ease the accumulated spin to the NEAREST
+    // full turn so the model settles exactly on modelYaw — keeping every
+    // section's keyframe deterministic.
+    const loop = contactSpin.strength;
     spinOffset += dt * SPIN_SPEED * loop;
     const settle = 1 - loop; // 0 while looping, → 1 between loops
     if (settle > 0.001) {
@@ -177,7 +196,21 @@ export function createWorld(canvas: HTMLCanvasElement): World {
     // SWAY: gentle left↔right rock around modelYaw on ABOUT & PROJECTS.
     swayClock += dt;
     const swayOffset = Math.sin(swayClock * SWAY_FREQ) * SWAY_AMP * sway.strength;
-    stage.rotation.y = modelYaw.value + spinOffset + swayOffset;
+
+    // POINTER-LOOK: on the HERO the figure faces us and turns to follow the
+    // cursor. idleSpin.strength is 1 on the hero and scroll.ts fades it to 0
+    // past it, so the look-tracking (and a slow idle breath) cleanly hand off
+    // to each section's fixed keyframe.
+    const look = idleSpin.strength;
+    const ease = 1 - Math.exp(-dt * 5);
+    lookSmooth.x += (pointer.x - lookSmooth.x) * ease;
+    lookSmooth.y += (pointer.y - lookSmooth.y) * ease;
+    const breath = Math.sin(swayClock * 0.7) * IDLE_BREATH * look;
+    const lookYaw = lookSmooth.x * LOOK_YAW * look;
+    const lookPitch = -lookSmooth.y * LOOK_PITCH * look;
+
+    stage.rotation.y = modelYaw.value + spinOffset + swayOffset + lookYaw + breath;
+    figure.rotation.x = lookPitch;
     // Tech swarm orbits the figurine; shares the hero fade (idleSpin.strength).
     orbiters.update(dt, idleSpin.strength);
     camera.lookAt(cameraTarget);
@@ -197,7 +230,7 @@ export function createWorld(canvas: HTMLCanvasElement): World {
     renderer.forceContextLoss();
   }
 
-  return { renderer, scene, camera, stage, cameraTarget, idleSpin, sway, contactSpin, modelYaw, resize, render, dispose };
+  return { renderer, scene, camera, stage, figure, pointer, cameraTarget, idleSpin, sway, contactSpin, modelYaw, resize, render, dispose };
 }
 
 /* ---------------------------------------------------------------- */
@@ -242,10 +275,10 @@ export async function loadFigurine(
         obj.receiveShadow = true;
       }
     });
-    world.stage.add(model);
+    world.figure.add(model);
   } catch {
     console.warn(`[scene] ${MODEL_URL} not found — using placeholder figurine.`);
-    world.stage.add(makePlaceholderPerson());
+    world.figure.add(makePlaceholderPerson());
   } finally {
     draco.dispose();
   }

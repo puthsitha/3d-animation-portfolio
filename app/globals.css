@@ -761,6 +761,42 @@ h2 {
 }
 
 /* ---------------------------------------------------------------- */
+/*  Narrow / portrait: figure is framed centred in the UPPER half     */
+/*  (see KEYFRAMES_NARROW), so drop the section copy into the LOWER   */
+/*  half — over a soft scrim — instead of letting it sit on the body. */
+/* ---------------------------------------------------------------- */
+@media (max-width: 768px) {
+  .section--about {
+    align-items: flex-end;
+    padding-bottom: clamp(40px, 11vh, 96px);
+  }
+
+  .section--about .section__inner {
+    max-width: 100%;
+    margin: 0;
+    padding: 22px 18px;
+    border-radius: 18px;
+    background: linear-gradient(
+      to top,
+      rgba(8, 8, 14, 0.86) 48%,
+      rgba(8, 8, 14, 0) 100%
+    );
+  }
+
+  /* Project cards are their own glass panels, so they stay readable over the
+     figure; just anchor the stack to the lower part of the viewport. */
+  .section--projects {
+    align-items: flex-end;
+    padding-bottom: clamp(28px, 7vh, 64px);
+  }
+
+  .section--projects .section__inner {
+    max-width: 100%;
+    margin: 0;
+  }
+}
+
+/* ---------------------------------------------------------------- */
 /*  Liquid Glass button                                              */
 /* ---------------------------------------------------------------- */
 .liquid-btn {

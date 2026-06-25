@@ -84,11 +84,18 @@ export default function SceneController() {
         else start();
       };
       const onResize = () => world!.resize();
+      // Feed the pointer to the world so the hero figure can look at the cursor.
+      const onPointerMove = (e: PointerEvent) => {
+        world!.pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+        world!.pointer.y = -((e.clientY / window.innerHeight) * 2 - 1);
+      };
       document.addEventListener("visibilitychange", onVisibility);
       window.addEventListener("resize", onResize);
+      window.addEventListener("pointermove", onPointerMove);
       cleanupListeners = () => {
         document.removeEventListener("visibilitychange", onVisibility);
         window.removeEventListener("resize", onResize);
+        window.removeEventListener("pointermove", onPointerMove);
         window.removeEventListener("keydown", onDebugKey);
         debugCopyBtn?.removeEventListener("click", onDebugCopy);
       };
