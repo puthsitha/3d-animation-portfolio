@@ -34,7 +34,7 @@ const KEYFRAMES_WIDE: KeyframeSet = {
   hero: { pos: [0.0, 1.4, 5.2], target: [0.0, 1.0, 0.0], yaw: 0.0 },
   // 2 · ABOUT — figure held on the LEFT half, gazing toward the copy on the
   //     RIGHT, pulled back enough to leave a clear gutter between them.
-  about: { pos: [1.9, 1.5, 3.7], target: [1.45, 1.12, 0.0], yaw: 0.3 },
+  about: { pos: [-1.0, 1.5, 3.7], target: [1.45, 1.12, 0.0], yaw: 0.3 },
   // 3 · PROJECTS — figure held on the RIGHT half, facing the cards on the LEFT.
   projects: { pos: [2.6, 1.25, 3.3], target: [-1.55, 1.08, 0.0], yaw: -0.45 },
   // 4 · CONTACT — pull back and up for a top-down hero-shot finish.
@@ -107,21 +107,53 @@ export function createScrollDirector(world: World): ScrollDirector {
 
     // Animate position AND lookAt target together for each leg.
     // (cameraTarget is re-applied via camera.lookAt in the render loop.)
-    tl.to(camera.position, { x: K.about.pos[0], y: K.about.pos[1], z: K.about.pos[2] }, 0)
-      .to(cameraTarget, { x: K.about.target[0], y: K.about.target[1], z: K.about.target[2] }, 0)
+    tl.to(
+      camera.position,
+      { x: K.about.pos[0], y: K.about.pos[1], z: K.about.pos[2] },
+      0,
+    )
+      .to(
+        cameraTarget,
+        { x: K.about.target[0], y: K.about.target[1], z: K.about.target[2] },
+        0,
+      )
       // turn the figure to face the About text, fade the hero pointer-look out
       // and fade the gentle left↔right sway in for ABOUT & PROJECTS
       .to(world.modelYaw, { value: K.about.yaw }, 0)
       .to(world.idleSpin, { strength: 0 }, 0)
       .to(world.sway, { strength: 1 }, 0)
 
-      .to(camera.position, { x: K.projects.pos[0], y: K.projects.pos[1], z: K.projects.pos[2] }, 1)
-      .to(cameraTarget, { x: K.projects.target[0], y: K.projects.target[1], z: K.projects.target[2] }, 1)
+      .to(
+        camera.position,
+        { x: K.projects.pos[0], y: K.projects.pos[1], z: K.projects.pos[2] },
+        1,
+      )
+      .to(
+        cameraTarget,
+        {
+          x: K.projects.target[0],
+          y: K.projects.target[1],
+          z: K.projects.target[2],
+        },
+        1,
+      )
       // continue the turn so the figure faces the Projects cards
       .to(world.modelYaw, { value: K.projects.yaw }, 1)
 
-      .to(camera.position, { x: K.contact.pos[0], y: K.contact.pos[1], z: K.contact.pos[2] }, 2)
-      .to(cameraTarget, { x: K.contact.target[0], y: K.contact.target[1], z: K.contact.target[2] }, 2)
+      .to(
+        camera.position,
+        { x: K.contact.pos[0], y: K.contact.pos[1], z: K.contact.pos[2] },
+        2,
+      )
+      .to(
+        cameraTarget,
+        {
+          x: K.contact.target[0],
+          y: K.contact.target[1],
+          z: K.contact.target[2],
+        },
+        2,
+      )
       .to(world.modelYaw, { value: K.contact.yaw }, 2)
       // stop the sway and let the figure loop all the way around on CONTACT
       .to(world.sway, { strength: 0 }, 2)
@@ -190,7 +222,9 @@ export function createScrollDirector(world: World): ScrollDirector {
     // keep the user where they were in the timeline after the rebuild
     tl?.scrollTrigger?.scroll(
       (tl.scrollTrigger.start as number) +
-        progress * ((tl.scrollTrigger.end as number) - (tl.scrollTrigger.start as number)),
+        progress *
+          ((tl.scrollTrigger.end as number) -
+            (tl.scrollTrigger.start as number)),
     );
   };
   window.addEventListener("resize", onResize);

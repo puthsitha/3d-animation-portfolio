@@ -49,7 +49,9 @@ export default function Home() {
             Copy
           </button>
         </div>
-        <code id="debug-readout-value" className="debug-readout__value">…</code>
+        <code id="debug-readout-value" className="debug-readout__value">
+          …
+        </code>
         <span className="debug-readout__hint">
           press D to toggle · enter Explore and drag to reframe
         </span>
@@ -128,8 +130,8 @@ export default function Home() {
                 <span className="card__tag">React Native · Redux</span>
                 <h3>E-commerce &amp; Booking</h3>
                 <p>
-                  React Native apps for e-commerce, hotel and booking-tour —
-                  ABA payment integration, Redux &amp; Zustand, led with a team.
+                  React Native apps for e-commerce, hotel and booking-tour — ABA
+                  payment integration, Redux &amp; Zustand, led with a team.
                 </p>
               </article>
             </div>
@@ -186,8 +188,8 @@ export default function Home() {
                   <h3>Mobile Developer · Hattha Bank</h3>
                   <p>
                     Enhance, maintain and fix issues on the Hattha Mobile app
-                    using Swift, UIKit &amp; SwiftUI, and the Hattha Merchant app
-                    using Flutter.
+                    using Swift, UIKit &amp; SwiftUI, and the Hattha Merchant
+                    app using Flutter.
                   </p>
                 </StaggerItem>
                 <StaggerItem as="li" className="timeline__item">
@@ -257,7 +259,10 @@ export default function Home() {
 
               <SkillBars
                 skills={[
-                  { label: "React (React Native & React JS)", value: 96 },
+                  {
+                    label: "Technical (Swift, Flutter, React Native)",
+                    value: 96,
+                  },
                   { label: "Communication & Teamwork", value: 75 },
                   { label: "Project Management", value: 50 },
                   { label: "Design", value: 42 },
@@ -287,7 +292,11 @@ export default function Home() {
                     whileHover={{
                       y: -4,
                       scale: 1.06,
-                      transition: { type: "spring", stiffness: 400, damping: 18 },
+                      transition: {
+                        type: "spring",
+                        stiffness: 400,
+                        damping: 18,
+                      },
                     }}>
                     {t}
                   </StaggerItem>
@@ -307,8 +316,8 @@ export default function Home() {
               <p className="eyebrow">07 — Résumé</p>
               <h2>Download my CV</h2>
               <p className="body-copy">
-                Prefer the full document? Preview it right here or grab a copy as
-                PDF.
+                Prefer the full document? Preview it right here or grab a copy
+                as PDF.
               </p>
               <div className="cv-actions">
                 <MotionLink
