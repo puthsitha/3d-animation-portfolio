@@ -1,5 +1,7 @@
 # Puthsitha — 3D Portfolio
 
+> **Status:** v1.0.0 — V1 closed. See [CHANGELOG.md](CHANGELOG.md). Further work continues in V2.
+
 Scroll-driven 3D portfolio landing page (inspired by the WebGi Canon camera demo),
 built with **Next.js (App Router) + TypeScript**, Three.js and GSAP ScrollTrigger.
 
