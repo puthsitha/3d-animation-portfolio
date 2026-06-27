@@ -5,6 +5,8 @@ import Typewriter from "@/components/Typewriter";
 import RotatingText from "@/components/RotatingText";
 import LiquidButton from "@/components/LiquidButton";
 import SectionArt from "@/components/SectionArt";
+import SkillBars from "@/components/SkillBars";
+import { Reveal, Stagger, StaggerItem, MotionLink } from "@/components/Motion";
 
 const CV_FILE = "/Puthsitha_Moeurn_CV.pdf";
 
@@ -172,14 +174,14 @@ export default function Home() {
         {/* EXPERIENCE */}
         <section className="cv-section" data-cv="experience">
           <div className="cv-section__inner">
-            <div className="cv-section__art">
+            <Reveal className="cv-section__art" direction="right">
               <SectionArt variant="experience" />
-            </div>
-            <div className="cv-section__body">
+            </Reveal>
+            <Reveal className="cv-section__body" direction="left" delay={0.1}>
               <p className="eyebrow">04 — Experience</p>
               <h2>Where I&apos;ve worked</h2>
-              <ol className="timeline">
-                <li className="timeline__item">
+              <Stagger as="ol" className="timeline">
+                <StaggerItem as="li" className="timeline__item">
                   <span className="timeline__date">Sep 2025 — Present</span>
                   <h3>Mobile Developer · Hattha Bank</h3>
                   <p>
@@ -187,16 +189,16 @@ export default function Home() {
                     using Swift, UIKit &amp; SwiftUI, and the Hattha Merchant app
                     using Flutter.
                   </p>
-                </li>
-                <li className="timeline__item">
+                </StaggerItem>
+                <StaggerItem as="li" className="timeline__item">
                   <span className="timeline__date">Apr 2024 — Aug 2025</span>
                   <h3>Mobile Developer · Digital One</h3>
                   <p>
                     Built Android &amp; iOS apps with Flutter, integrated APIs
                     and bank services, using BLoC and Provider state management.
                   </p>
-                </li>
-                <li className="timeline__item">
+                </StaggerItem>
+                <StaggerItem as="li" className="timeline__item">
                   <span className="timeline__date">Dec 2021 — Mar 2024</span>
                   <h3>Mobile Developer · PHSAR TECH</h3>
                   <p>
@@ -204,78 +206,65 @@ export default function Home() {
                     bank integration using Redux and Zustand. Led projects,
                     managing tasks, meetings and team responsibilities.
                   </p>
-                </li>
-                <li className="timeline__item">
+                </StaggerItem>
+                <StaggerItem as="li" className="timeline__item">
                   <span className="timeline__date">Feb 2020</span>
                   <h3>Leadership Training · YRDP (NGO)</h3>
                   <p>
                     Completed the Youth Resource Development Program&apos;s
                     Leadership &amp; Personal Development training.
                   </p>
-                </li>
-              </ol>
-            </div>
+                </StaggerItem>
+              </Stagger>
+            </Reveal>
           </div>
         </section>
 
         {/* EDUCATION */}
         <section className="cv-section cv-section--alt" data-cv="education">
           <div className="cv-section__inner cv-section__inner--reverse">
-            <div className="cv-section__art">
+            <Reveal className="cv-section__art" direction="left">
               <SectionArt variant="education" />
-            </div>
-            <div className="cv-section__body">
+            </Reveal>
+            <Reveal className="cv-section__body" direction="right" delay={0.1}>
               <p className="eyebrow">05 — Education</p>
               <h2>Studied &amp; certified</h2>
-              <ol className="timeline">
-                <li className="timeline__item">
+              <Stagger as="ol" className="timeline">
+                <StaggerItem as="li" className="timeline__item">
                   <span className="timeline__date">2019 — 2023</span>
                   <h3>Royal University of Phnom Penh (RUPP)</h3>
                   <p>Bachelor&apos;s Degree in Computer Science.</p>
-                </li>
-                <li className="timeline__item">
+                </StaggerItem>
+                <StaggerItem as="li" className="timeline__item">
                   <span className="timeline__date">2016 — 2019</span>
                   <h3>Thmorkoul High School</h3>
                   <p>High school diploma — passed Bac II (Grade C).</p>
-                </li>
-              </ol>
-            </div>
+                </StaggerItem>
+              </Stagger>
+            </Reveal>
           </div>
         </section>
 
         {/* SKILLS */}
         <section className="cv-section" data-cv="skills">
           <div className="cv-section__inner">
-            <div className="cv-section__art">
+            <Reveal className="cv-section__art" direction="right">
               <SectionArt variant="skills" />
-            </div>
-            <div className="cv-section__body">
+            </Reveal>
+            <Reveal className="cv-section__body" direction="left" delay={0.1}>
               <p className="eyebrow">06 — Skills</p>
               <h2>What I work with</h2>
 
-              <div className="skill-bars">
-                {[
+              <SkillBars
+                skills={[
                   { label: "React (React Native & React JS)", value: 96 },
                   { label: "Communication & Teamwork", value: 75 },
                   { label: "Project Management", value: 50 },
                   { label: "Design", value: 42 },
-                ].map((s) => (
-                  <div className="skill-bar" key={s.label}>
-                    <div className="skill-bar__head">
-                      <span>{s.label}</span>
-                      <span className="skill-bar__pct">{s.value}%</span>
-                    </div>
-                    <div className="skill-bar__track">
-                      <span
-                        className="skill-bar__fill"
-                        style={{ width: `${s.value}%` }}
-                      />
-                    </div>
-                  </div>
-                ))}
-              </div>
+                ]}
+              />
 
-              <ul className="skill-tags">
+              <Stagger as="ul" className="skill-tags">
                 {[
                   "Swift",
                   "UIKit",
@@ -291,22 +280,30 @@ export default function Home() {
                   "Bank / ABA integration",
                   "App Store release",
                 ].map((t) => (
-                  <li className="skill-tag" key={t}>
+                  <StaggerItem
+                    as="li"
+                    className="skill-tag"
+                    key={t}
+                    whileHover={{
+                      y: -4,
+                      scale: 1.06,
+                      transition: { type: "spring", stiffness: 400, damping: 18 },
+                    }}>
                     {t}
-                  </li>
+                  </StaggerItem>
                 ))}
-              </ul>
-            </div>
+              </Stagger>
+            </Reveal>
           </div>
         </section>
 
         {/* RESUME / CV */}
         <section className="cv-section cv-section--alt" data-cv="resume">
           <div className="cv-section__inner cv-section__inner--reverse">
-            <div className="cv-section__art">
+            <Reveal className="cv-section__art" direction="left">
               <SectionArt variant="resume" />
-            </div>
-            <div className="cv-section__body">
+            </Reveal>
+            <Reveal className="cv-section__body" direction="right" delay={0.1}>
               <p className="eyebrow">07 — Résumé</p>
               <h2>Download my CV</h2>
               <p className="body-copy">
@@ -314,16 +311,19 @@ export default function Home() {
                 PDF.
               </p>
               <div className="cv-actions">
-                <a className="cv-btn cv-btn--primary" href={CV_FILE} download>
+                <MotionLink
+                  className="cv-btn cv-btn--primary"
+                  href={CV_FILE}
+                  download>
                   ↓ Download PDF
-                </a>
-                <a
+                </MotionLink>
+                <MotionLink
                   className="cv-btn"
                   href={CV_FILE}
                   target="_blank"
                   rel="noreferrer">
                   ↗ Open in new tab
-                </a>
+                </MotionLink>
               </div>
               <div className="cv-preview">
                 <object
@@ -338,14 +338,14 @@ export default function Home() {
                   />
                 </object>
               </div>
-            </div>
+            </Reveal>
           </div>
         </section>
 
         {/* FOOTER — personal details + references */}
         <footer className="cv-footer">
-          <div className="cv-footer__grid">
-            <div>
+          <Stagger className="cv-footer__grid">
+            <StaggerItem>
               <p className="eyebrow">Personal</p>
               <ul className="cv-meta">
                 <li>
@@ -361,8 +361,8 @@ export default function Home() {
                   <span>Location</span>Phnom Penh
                 </li>
               </ul>
-            </div>
-            <div>
+            </StaggerItem>
+            <StaggerItem>
               <p className="eyebrow">References</p>
               <ul className="cv-meta">
                 <li>
@@ -373,8 +373,8 @@ export default function Home() {
                   205
                 </li>
               </ul>
-            </div>
-            <div>
+            </StaggerItem>
+            <StaggerItem>
               <p className="eyebrow">Get in touch</p>
               <ul className="cv-meta">
                 <li>
@@ -397,8 +397,8 @@ export default function Home() {
                   </a>
                 </li>
               </ul>
-            </div>
-          </div>
+            </StaggerItem>
+          </Stagger>
           <p className="cv-footer__copy">
             © 2026 Puthsitha Moeurn · Built with Next.js &amp; Three.js
           </p>
