@@ -54,6 +54,11 @@ export interface World {
 
 const MODEL_URL = "/models/me.glb";
 const MODEL_HEIGHT = 1.6; // world-units the figurine is normalised to
+// The exported GLB stands in a side-on pose (its face points along +X), so at
+// modelYaw 0 it would show a profile. Spin the model -90° about Y once on load
+// so its face points at the camera (+Z); now yaw 0 genuinely means "front" and
+// every scroll keyframe in scroll.ts stays correct.
+const MODEL_YAW_OFFSET = -Math.PI / 2;
 
 export function createWorld(canvas: HTMLCanvasElement): World {
   /* ------------------------------------------------------------ */
@@ -263,6 +268,9 @@ export async function loadFigurine(
     const size = box.getSize(new THREE.Vector3());
     const scale = MODEL_HEIGHT / size.y;
     model.scale.setScalar(scale);
+    // Turn the figure to face the camera before re-measuring, so the recentre
+    // below is computed against the final (rotated) bounds.
+    model.rotation.y = MODEL_YAW_OFFSET;
     box.setFromObject(model);
     const center = box.getCenter(new THREE.Vector3());
     model.position.x -= center.x;
